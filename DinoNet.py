@@ -5,12 +5,10 @@ import torch.nn.functional as F
 class DinoNet(nn.Module):
     def __init__(self):
         super(DinoNet, self).__init__()
-        self.fc1 = nn.Linear(6, 6)
-        self.fc2 = nn.Linear(6, 2)
+        self.fc1 = nn.Linear(7, 11)
+        self.fc2 = nn.Linear(11, 3)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
         x = self.fc2(x)
-        x = F.softmax(x, dim=0)
-
         return x

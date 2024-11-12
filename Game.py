@@ -3,6 +3,8 @@
 import pygame
 import os
 import random
+import datetime
+
 pygame.init()
 
 # Global Constants
@@ -25,8 +27,8 @@ LARGE_CACTUS = [pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus1.pn
                     "Assets/Cactus", "LargeCactus2.png")),
                 pygame.image.load(os.path.join("Assets/Cactus", "LargeCactus3.png"))]
 
-BIRD = [pygame.image.load(os.path.join("Assets/Bird", "Bird1.png")),
-        pygame.image.load(os.path.join("Assets/Bird", "Bird2.png"))]
+BIRD = [pygame.image.load(os.path.join("Assets/Bird", "Bird1_1.png")),
+        pygame.image.load(os.path.join("Assets/Bird", "Bird2_1.png"))]
 
 CLOUD = pygame.image.load(os.path.join("Assets/Other", "Cloud.png"))
 
@@ -126,14 +128,16 @@ class Dinosaur:
             obstacle_height = 0
             obstacle_id = 0
 
-        distancia_al_obstaculo = SCREEN_WIDTH - self.dino_rect.x if obstacle_x <= 0 else obstacle_x - self.dino_rect.x
+        distancia_al_obstaculo = SCREEN_WIDTH - \
+            self.dino_rect.x if obstacle_x <= 0 else obstacle_x - self.dino_rect.x
 
-        #params = [distancia_al_obstaculo, obstacle_id, obstacle_x, SCREEN_HEIGHT - obstacle_y, obstacle_width, obstacle_height, dino_y,  game_speed]
+        params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT -
+                  obstacle_y, obstacle_width, obstacle_height, dino_y, game_speed*10]
 
-        params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT - obstacle_y, obstacle_width, obstacle_height, game_speed]
+        # params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT - obstacle_y, game_speed]
 
-        #if self.id == 0:
-            #print(params)
+        # if self.id == 0:
+        # print(params)
 
         return params
 
@@ -193,7 +197,7 @@ class Bird(Obstacle):
         self.id = 3
         self.type = 0
         super().__init__(image, self.type, self.id)
-        self.rect.y = random.choice([230, 250, 270])
+        self.rect.y = random.choice([230, 250, 270]) - 98
         self.index = 0
 
     def draw(self, SCREEN):
@@ -217,19 +221,53 @@ class GameInstance:
         self.font = pygame.font.Font('freesansbold.ttf', 20)
         self.obstacles = []
 
+        self.start_time = datetime.datetime.now()
+        self.generation = 0
+        self.previous_avg = 0
+
     def score(self):
         self.points += 1
+        if self.points % 100 == 0 and self.game_speed < 30:
+            self.game_speed += 1
 
         text = self.font.render("Points: " + str(self.points), True, (0, 0, 0))
         textRect = text.get_rect()
         textRect.center = (1000, 40)
         SCREEN.blit(text, textRect)
 
+    def stats(self):
+        # Dinos vivos
         dinos_alive = self.font.render(
-            "Dinos Alive: " + str(len([dino for dino in self.dinos if dino.is_alive])), True, (0, 0, 0))
+            "Dinos vivos: " + str(len([dino for dino in self.dinos if dino.is_alive])), True, (0, 0, 0))
         dinosRect = dinos_alive.get_rect()
         dinosRect.bottomleft = (50, 500)
         SCREEN.blit(dinos_alive, dinosRect)
+
+        # Tiempo de simulacion en formato hh:mm:ss
+        current_time = datetime.datetime.now()
+        time_elapsed = current_time - self.start_time
+        time = self.font.render("Tiempo: " + str(time_elapsed), True, (0, 0, 0))
+        timeRect = time.get_rect()
+        timeRect.bottomleft = (50, 530)
+        SCREEN.blit(time, timeRect)
+
+        # Generacion actual
+        generation = self.font.render(
+            "Generacion: " + str(self.generation), True, (0, 0, 0))
+        generationRect = generation.get_rect()
+        generationRect.bottomleft = (50, 560)
+        SCREEN.blit(generation, generationRect)
+
+        # Puntaje promedio anterior
+        avg = self.font.render(
+            "Puntaje promedio generación anterior: " + str(self.previous_avg), True, (0, 0, 0))
+        avgRect = avg.get_rect()
+        avgRect.bottomleft = (50, 470)
+        SCREEN.blit(avg, avgRect)
+
+
+
+
 
     def background(self):
         image_width = BG.get_width()
@@ -263,12 +301,14 @@ class GameInstance:
 
             if len(self.obstacles) == 0:
                 random_obstacle = random.randint(0, 2)
+                if self.points < 500:
+                    random_obstacle = random.randint(0, 4)
 
                 if random_obstacle == 0:
                     self.obstacles.append(SmallCactus(SMALL_CACTUS))
                 elif random_obstacle == 1:
                     self.obstacles.append(LargeCactus(LARGE_CACTUS))
-                elif random_obstacle == 2:
+                else:
                     self.obstacles.append(Bird(BIRD))
 
             for obstacle in self.obstacles:
@@ -277,7 +317,10 @@ class GameInstance:
                 for dinosaur in self.dinos:
                     if dinosaur.is_alive and dinosaur.dino_rect.colliderect(obstacle.rect):
                         dinosaur.is_alive = False
-                        dinosaur.points = self.points
+
+            for dino in self.dinos:
+                if dino.is_alive:
+                    dino.points = self.points
 
             self.background()
 
@@ -285,9 +328,10 @@ class GameInstance:
             self.cloud.update(self.game_speed)
 
             self.score()
-            self.game_speed += 0.002
 
-            #self.clock.tick(30)
+            self.stats()
+
+            # self.clock.tick(30)
             pygame.display.update()
 
             return self.dinos
