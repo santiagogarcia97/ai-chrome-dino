@@ -1,9 +1,9 @@
 from Game import GameInstance
 from GeneticAlgorithm import GeneticAlgorithm
 
-population_size = 100
-mutation_rate = 0.01
-mutation_strength = 0.005
+population_size = 1000
+mutation_rate = 0.005
+mutation_strength = 0.003
 
 game_instance = GameInstance(dinos_count=population_size)
 genetic_algorithm = GeneticAlgorithm(population_size, mutation_rate, mutation_strength)

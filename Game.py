@@ -128,9 +128,9 @@ class Dinosaur:
 
         distancia_al_obstaculo = SCREEN_WIDTH - self.dino_rect.x if obstacle_x <= 0 else obstacle_x - self.dino_rect.x
 
-        #params = [distancia_al_obstaculo, obstacle_id, obstacle_x, SCREEN_HEIGHT - obstacle_y, obstacle_width, obstacle_height, dino_y,  game_speed]
+        params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT - obstacle_y, obstacle_width, obstacle_height, dino_y, game_speed*10]
 
-        params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT - obstacle_y, obstacle_width, obstacle_height, game_speed]
+        #params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT - obstacle_y, game_speed]
 
         #if self.id == 0:
             #print(params)
@@ -217,6 +217,8 @@ class GameInstance:
         self.font = pygame.font.Font('freesansbold.ttf', 20)
         self.obstacles = []
 
+        self.frame = 0
+
     def score(self):
         self.points += 1
 
@@ -251,6 +253,7 @@ class GameInstance:
 
     def play_step(self, actions):
         if self.run:
+            self.frame += 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
@@ -263,12 +266,14 @@ class GameInstance:
 
             if len(self.obstacles) == 0:
                 random_obstacle = random.randint(0, 2)
+                if self.frame < 500:
+                    random_obstacle = random.randint(0, 3)
 
                 if random_obstacle == 0:
                     self.obstacles.append(SmallCactus(SMALL_CACTUS))
                 elif random_obstacle == 1:
                     self.obstacles.append(LargeCactus(LARGE_CACTUS))
-                elif random_obstacle == 2:
+                else:
                     self.obstacles.append(Bird(BIRD))
 
             for obstacle in self.obstacles:

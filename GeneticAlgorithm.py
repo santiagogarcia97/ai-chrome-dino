@@ -48,8 +48,15 @@ class GeneticAlgorithm:
         state_tensor = torch.tensor(state, dtype=torch.float32)
         output = network(state_tensor)
         # Select action with highest probability
-        results = torch.softmax(output, dim=0)
-        predicted_class = torch.argmax(results).item()
+        #results = torch.softmax(output, dim=0)
+        #predicted_class = torch.argmax(results).item()
+
+        #the neural network returns a sigmoid value, if the value is greater than 0.5, the dinosaur jumps, otherwise it crouches
+        #predicted_class = 1 if output.item() > 0.5 else 0
+
+
+        probabilities = torch.softmax(output, dim=0)  
+        predicted_class = torch.argmax(probabilities).item()
 
         if predicted_class == 0:
             return "CROUCH"
@@ -62,7 +69,7 @@ class GeneticAlgorithm:
         fitness_scores = sorted(
             fitness_scores, key=lambda x: x["fitness"], reverse=True)
         # Cantidad a seleccionar (10%)
-        n = int(self.population_size * 0.1)
+        n = int(self.population_size * 0.05)
         selected_networks = []
         for i in range(n):
             selected_networks.append(self.population[fitness_scores[i]["id"]])
@@ -114,11 +121,17 @@ class GeneticAlgorithm:
             self.mutation(child)
             new_population.append(child)
 
-        # un 50% va a ser generado cruzando los padres seleccionados
-        for _ in range(int(self.population_size * 0.5)):
+        # un 30% va a ser generado cruzando los padres seleccionados
+        for _ in range(int(self.population_size * 0.40)):
             parent1, parent2 = random.sample(parents, 2)
             child = self.crossover(parent1, parent2)
             self.mutation(child)
+            new_population.append(child)
+
+        for _ in range(int(self.population_size * 0.2)):
+            random_parent = random.choice(parents)
+            new_dino = DinoNet()
+            child = self.crossover(random_parent, new_dino)
             new_population.append(child)
 
         # Completo el 5% restante con redes neuronales nuevas
