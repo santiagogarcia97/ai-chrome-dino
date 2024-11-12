@@ -89,15 +89,15 @@ class GeneticAlgorithm:
         best_performer = parents[0]
 
         # Un 20% va a ser copias del mejor performer
-        for _ in range(int(self.population_size * 0.2)):
-            new_population.append(copy.deepcopy(best_performer))
+        #for _ in range(int(self.population_size * 0.2)):
+            #new_population.append(copy.deepcopy(best_performer))
 
         # un 30% va a ser generado mutando el mejor performer
         for _ in range(int(self.population_size * 0.3)):
             new_population.append(self.mutate(best_performer))
 
         # un 20% va a ser generado cruzando los padres seleccionados
-        for _ in range(int(self.population_size * 0.20)):
+        for _ in range(int(self.population_size * 0.40)):
             parent1, parent2 = random.sample(parents, 2)
             child = self.crossover(parent1, parent2)
             new_population.append(self.mutate(child))

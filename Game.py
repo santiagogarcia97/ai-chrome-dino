@@ -331,7 +331,7 @@ class GameInstance:
 
             self.stats()
 
-            # self.clock.tick(30)
+            self.clock.tick(30)
             pygame.display.update()
 
             return self.dinos

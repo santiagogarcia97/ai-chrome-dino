@@ -12,8 +12,8 @@ results_path = 'results/' + start_time.strftime('%Y-%m-%dT%H-%M-%S')
 os.makedirs(results_path)
 
 population_size = 100 # Cantidad de dinos en cada generacion
-mutation_rate = 0.001 # Probabilidad de mutacion
-mutation_strength = 0.0007 # Fuerza de la mutacion
+mutation_rate = 0.1 # Probabilidad de mutacion
+mutation_strength = 0.007 # Fuerza de la mutacion
 
 game_instance = GameInstance(dinos_count=population_size)
 game_instance.start_time = start_time
