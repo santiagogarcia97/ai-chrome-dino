@@ -10,7 +10,7 @@ genetic_algorithm = GeneticAlgorithm(population_size, mutation_rate, mutation_st
 
 results = []
 
-for generation in range(500):
+for generation in range(300):
     fitness_scores = genetic_algorithm.evaluate_population(game_instance)
     genetic_algorithm.evolve(fitness_scores)
     best_fitness = max(fitness_scores, key=lambda x: x['fitness'])['fitness']
