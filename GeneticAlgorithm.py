@@ -38,7 +38,7 @@ class GeneticAlgorithm:
             # Realizo un paso del juego con las acciones obtenidas
             dinos = game_instance.play_step(actions)
             all_dinos_dead = all(not dino.is_alive or (
-                dino.is_alive and dino.points > 10000) for dino in dinos)
+                dino.is_alive and dino.points > 5000) for dino in dinos)
 
         # Obtengo los puntajes de cada dinosaurio
         for dino in game_instance.dinos:

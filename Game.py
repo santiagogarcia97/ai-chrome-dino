@@ -132,7 +132,7 @@ class Dinosaur:
             self.dino_rect.x if obstacle_x <= 0 else obstacle_x - self.dino_rect.x
 
         params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT -
-                  obstacle_y, obstacle_width, obstacle_height, dino_y, game_speed*10]
+                  obstacle_y, obstacle_width, obstacle_height, dino_y, game_speed]
 
         # params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT - obstacle_y, game_speed]
 
