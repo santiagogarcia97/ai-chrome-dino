@@ -11,12 +11,12 @@ start_time = datetime.datetime.now()
 results_path = 'results/' + start_time.strftime('%Y-%m-%dT%H-%M-%S')
 os.makedirs(results_path)
 
-population_size = 1000 # Cantidad de dinos en cada generacion
+population_size = 300 # Cantidad de dinos en cada generacion
 mutation_rate = 0.01 # Probabilidad de mutacion
 mutation_strength = 0.007 # Fuerza de la mutacion
 
 game_instance = GameInstance(dinos_count=population_size)
-game_instance.start_time = start_time
+game_instance.start_time = start_time - datetime.timedelta(minutes=43)
 genetic_algorithm = GeneticAlgorithm(population_size, mutation_rate, mutation_strength)
 results = []
 
@@ -39,8 +39,8 @@ for generation in range(300):
     avg_fitness = sum(scores) / len(scores)
     median_fitness = statistics.median(scores)
 
-    game_instance.generation = generation + 1
     game_instance.previous_avg = avg_fitness
+    game_instance.generation += 1
 
     print(f"Generation {generation + 1}: Best fitness = {best_fitness}  Avg = {avg_fitness}  Median = {median_fitness}")
 

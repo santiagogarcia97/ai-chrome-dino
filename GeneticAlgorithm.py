@@ -88,31 +88,27 @@ class GeneticAlgorithm:
     def evolve(self, fitness_scores):
         new_population = []
 
-        # Selecciono el 5% de los mejores performers que van a pasar directamente a la siguiente generacion
+        # Selecciono el 10% de los mejores performers que van a pasar directamente a la siguiente generacion
         # y van a ser los padres de la nueva generacion
-        parents = self.selection(fitness_scores, percentage=0.05)
+        parents = self.selection(fitness_scores, percentage=0.1)
         for parent in parents:
             new_population.append(copy.deepcopy(parent))
 
         # Obtengo la red neuronal con mejor puntaje
         best_performer = parents[0]
 
-        # Un 20% va a ser copias del mejor performer
-        #for _ in range(int(self.population_size * 0.2)):
-            #new_population.append(copy.deepcopy(best_performer))
-
         # un 30% va a ser generado mutando el mejor performer
-        for _ in range(int(self.population_size * 0.3)):
+        for _ in range(int(self.population_size * 0.30)):
             new_population.append(self.mutate(best_performer))
 
-        # un 20% va a ser generado cruzando los padres seleccionados
+        # un 40% va a ser generado cruzando los padres seleccionados
         for _ in range(int(self.population_size * 0.40)):
             parent1, parent2 = random.sample(parents, 2)
             child = self.crossover(parent1, parent2)
             new_population.append(self.mutate(child))
 
-        # un 20% va a ser generado cruzando un padre seleccionado con una red neuronal nueva
-        for _ in range(int(self.population_size * 0.2)):
+        # un 15% va a ser generado cruzando un padre seleccionado con una red neuronal nueva
+        for _ in range(int(self.population_size * 0.15)):
             random_parent = random.choice(parents)
             new_dino = DinoNet()
             child = self.crossover(random_parent, new_dino)

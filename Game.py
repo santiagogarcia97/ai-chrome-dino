@@ -223,7 +223,7 @@ class GameInstance:
 
     def score(self):
         self.points += 1
-        if self.points % 100 == 0 and self.game_speed < 30:
+        if self.points % 100 == 0 and self.game_speed < 50:
             self.game_speed += 1
 
         text = self.font.render("Points: " + str(self.points), True, (0, 0, 0))
@@ -330,7 +330,7 @@ class GameInstance:
 
             self.stats()
 
-            self.clock.tick(30)
+            #self.clock.tick(30)
             pygame.display.update()
 
             return self.dinos
