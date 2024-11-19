@@ -111,6 +111,7 @@ class Dinosaur:
     def draw(self, SCREEN):
         SCREEN.blit(self.image, (self.dino_rect.x, self.dino_rect.y))
 
+    # Obtengo el estado del dinosaurio
     def get_state(self, obstacles, game_speed):
         dino_y = self.dino_rect.y
 
@@ -121,7 +122,7 @@ class Dinosaur:
             obstacle_height = obstacles[0].rect.height
             obstacle_id = obstacles[0].id
         else:
-            # Default values if no obstacles are present
+            # Valores por defecto si no hay obstaculos
             obstacle_x = 0
             obstacle_y = 0
             obstacle_width = 0
@@ -133,11 +134,6 @@ class Dinosaur:
 
         params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT -
                   obstacle_y, obstacle_width, obstacle_height, dino_y, game_speed]
-
-        # params = [distancia_al_obstaculo, obstacle_id, SCREEN_HEIGHT - obstacle_y, game_speed]
-
-        # if self.id == 0:
-        # print(params)
 
         return params
 
@@ -222,7 +218,7 @@ class GameInstance:
         self.obstacles = []
 
         self.start_time = datetime.datetime.now()
-        self.generation = 0
+        self.generation = 1
         self.previous_avg = 0
 
     def score(self):
@@ -265,10 +261,6 @@ class GameInstance:
         avgRect.bottomleft = (50, 470)
         SCREEN.blit(avg, avgRect)
 
-
-
-
-
     def background(self):
         image_width = BG.get_width()
         SCREEN.blit(BG, (self.x_pos_bg, self.y_pos_bg))
@@ -287,6 +279,9 @@ class GameInstance:
         self.points = 0
         self.obstacles = []
 
+    # Avanza un paso en la simulacion del juego (1 frame)
+    # Recibe una lista de acciones a realizar por cada dinosaurio
+    # Devuelve las lista de dinosaurios actualizada
     def play_step(self, actions):
         if self.run:
             for event in pygame.event.get():
@@ -294,11 +289,13 @@ class GameInstance:
                     self.run = False
             SCREEN.fill((255, 255, 255))
 
+            # Actualizo el estado de los dinosaurios que estan vivos
             for i in range(self.dinos_count):
                 if self.dinos[i].is_alive:
                     self.dinos[i].update(actions[i])
                     self.dinos[i].draw(SCREEN)
 
+            # Genero obstaculos
             if len(self.obstacles) == 0:
                 random_obstacle = random.randint(0, 2)
                 if self.points < 500:
@@ -311,6 +308,7 @@ class GameInstance:
                 else:
                     self.obstacles.append(Bird(BIRD))
 
+            # Dibujo los obstaculos y chequeo colisiones con los dinosaurios
             for obstacle in self.obstacles:
                 obstacle.draw(SCREEN)
                 obstacle.update(self.game_speed, self.obstacles)
@@ -318,6 +316,7 @@ class GameInstance:
                     if dinosaur.is_alive and dinosaur.dino_rect.colliderect(obstacle.rect):
                         dinosaur.is_alive = False
 
+            # Actualizo el puntaje de los dinosaurios vivos
             for dino in self.dinos:
                 if dino.is_alive:
                     dino.points = self.points

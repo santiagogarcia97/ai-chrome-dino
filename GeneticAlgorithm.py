@@ -9,9 +9,12 @@ class GeneticAlgorithm:
         self.population_size = population_size
         self.mutation_rate = mutation_rate
         self.mutation_strength = mutation_strength
+        # Inicializo la poblacion de redes neuronales, 
+        # todas con pesos aleatorios en una primera instancia
         self.population = [DinoNet() for _ in range(population_size)]
 
-    # Evaluo la poblacion de redes neuronales en el juego, para cada frame, obtengo el estado del dinosaurio y le pido una accion a realizar
+    # Evaluo la poblacion de redes neuronales en el juego, 
+    # para cada frame, obtengo el estado del dinosaurio y le pido una accion a realizar
     def evaluate_population(self, game_instance):
         # Reinicio el juego
         game_instance.restart()
@@ -23,10 +26,12 @@ class GeneticAlgorithm:
         all_dinos_dead = False
         while not all_dinos_dead:
 
-            # Lista de acciones a realizar por cada red neuronal de la poblacion, cada red neuronal se corresponde con un dinosaurio
+            # Lista de acciones a realizar por cada red neuronal de la poblacion, 
+            # cada red neuronal se corresponde con un dinosaurio
             actions = []
 
-            # Para cada red neuronal de la poblacion, si el dinosaurio esta vivo, obtengo su estado y le pido una accion a realizar
+            # Para cada red neuronal de la poblacion, si el dinosaurio esta vivo, 
+            # obtengo su estado y le pido una accion a realizar
             for i in range(len(game_instance.dinos)):
                 if not game_instance.dinos[i].is_alive:
                     actions.append("NONE")
@@ -37,6 +42,9 @@ class GeneticAlgorithm:
 
             # Realizo un paso del juego con las acciones obtenidas
             dinos = game_instance.play_step(actions)
+
+            # Detengo la simulacion si todos los dinosaurios estan muertos 
+            # o si superaron los 5000 puntos
             all_dinos_dead = all(not dino.is_alive or (
                 dino.is_alive and dino.points > 5000) for dino in dinos)
 
@@ -56,6 +64,7 @@ class GeneticAlgorithm:
         # Obtengo la clase con mayor probabilidad
         predicted_class = torch.argmax(probabilities).item()
 
+        # Devuelvo la accion a realizar segun la clase obtenida
         if predicted_class == 0:
             return "CROUCH"
         elif predicted_class == 1:
@@ -63,9 +72,9 @@ class GeneticAlgorithm:
         else:
             return "NONE"
 
-    # A partir de los puntajes de fitness de cada red neuronal, selecciono un porcentaje de las mejores redes neuronales
+    # A partir de los puntajes de cada red neuronal, 
+    # selecciono un porcentaje de las mejores redes neuronales
     def selection(self, fitness_scores, percentage=0.1):
-        # Sort fitness scores in descending order
         fitness_scores = sorted(
             fitness_scores, key=lambda x: x["fitness"], reverse=True)
         n = int(self.population_size * percentage)
@@ -120,9 +129,9 @@ class GeneticAlgorithm:
     def mutate(self, network):
         new_network = DinoNet()
         for (new_param, old_param) in zip(new_network.parameters(), network.parameters()):
-            # Apply mutation with a certain probability
+            # Aplico mutacion a los pesos de la red neuronal segun la probabilidad de mutacion
+            # y la fuerza de la mutacion
             if random.random() < self.mutation_rate:
-                # Add a random value scaled by the mutation strength
                 new_param.data = old_param.data + \
                     torch.randn_like(old_param.data) * self.mutation_strength
             else:
@@ -133,8 +142,11 @@ class GeneticAlgorithm:
     def crossover(self, network1, network2):
         child_network = DinoNet()
         for (child_param, param1, param2) in zip(child_network.parameters(), network1.parameters(), network2.parameters()):
-            # Randomly choose weights/biases from either parent
+            # ARmo una mascara aleatoria, array de booleanos del largo de los parametros de la red neuronal
             mask = torch.randint(0, 2, child_param.shape, dtype=torch.bool)
+
+            # Si la mascara es True, el parametro del hijo es el parametro de la red neuronal 1
+            # Si la mascara es False, el parametro del hijo es el parametro de la red neuronal 2
             child_param.data = torch.where(
                 mask, param1.data, param2.data)
         return child_network
